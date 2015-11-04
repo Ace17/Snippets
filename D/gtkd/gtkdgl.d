@@ -10,11 +10,7 @@
  */
 
 import std.string;
-import std.algorithm;
-import std.math;
 
-import gdk.Cairo;
-import gdk.Color;
 import gdk.GLContext;
 
 import gtk.DrawingArea;
