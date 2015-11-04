@@ -1,0 +1,3 @@
+toto.o: toto.c hello4.h
+hardy.o: hardy.c hello.h hello4.h
+laurel.o: laurel.c hello.h hello4.h
