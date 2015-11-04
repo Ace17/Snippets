@@ -13,22 +13,35 @@ import std.string;
 import std.algorithm;
 import std.math;
 
-import cairo.Context;
-import cairo.ImageSurface;
-
-import gdk.Color;
 import gdk.Cairo;
+import gdk.Color;
 import gdk.GLContext;
 
 import gtk.DrawingArea;
-import gtk.Widget;
 import gtk.GLArea;
+import gtk.Main;
+import gtk.MainWindow;
+import gtk.Widget;
 
 import glib.Timeout;
 
 import openglcore;
 
-class MonitorArea : GLArea
+int main(string[] args)
+{
+  Main.init(args);
+
+  auto mainWnd = new MainWindow("GLArea GTKD minimal example");
+
+  auto wnd = new MyWindow;
+  mainWnd.add(wnd);
+  mainWnd.showAll();
+
+  Main.run();
+  return 0;
+}
+
+class MyWindow : GLArea
 {
 public:
   this()
@@ -126,12 +139,8 @@ public:
 
 void initShaders(uint* program_out, uint* mvp_location_out, uint* position_location_out, uint* color_location_out)
 {
-  immutable VertShaderCode = cast(string)import ("vertex.glsl");
-
   const vertex = compileShader(GL_VERTEX_SHADER, VertShaderCode ~ "\0");
   scope(exit) glDeleteShader(vertex);
-
-  immutable FragShaderCode = cast(string)import ("fragment.glsl");
 
   const fragment = compileShader(GL_FRAGMENT_SHADER, FragShaderCode ~ "\0");
   scope(exit) glDeleteShader(fragment);
@@ -208,4 +217,30 @@ float[16] getIdentityMatrix() pure
 
   return mat;
 }
+
+immutable FragShaderCode = `
+#version 130
+
+smooth in vec4 vertexColor;
+
+out vec4 outputColor;
+
+void main() {
+  outputColor = vertexColor;
+}`;
+
+immutable VertShaderCode = `
+#version 130
+
+in vec3 position;
+in vec3 color;
+
+uniform mat4 mvp;
+
+smooth out vec4 vertexColor;
+
+void main() {
+  gl_Position = mvp * vec4(position, 1.0);
+  vertexColor = vec4(color, 1.0);
+}`;
 
